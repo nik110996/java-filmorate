@@ -30,7 +30,7 @@ public class Validator {
         if (login.isBlank() || login.contains(" ")) {
             throw new ValidationException("поле login заполнено некорректно");
         }
-        if ( user.getName() == null || user.getName().isBlank() ) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(login);
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
