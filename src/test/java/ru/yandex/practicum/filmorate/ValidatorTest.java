@@ -32,7 +32,7 @@ public class ValidatorTest {
     @Test
     void invalidDescription() {
     String description = "";
-    for (int i = 0; i<200; i++) {
+    for (int i = 0; i < 200; i++) {
         description += i;
     }
         Film film1 = Film.builder()
@@ -94,7 +94,7 @@ public class ValidatorTest {
                 .email("")
                 .login("login")
                 .name("name")
-                .birthday(LocalDate.of(1991, 11 , 1))
+                .birthday(LocalDate.of(1991, 11, 1))
                 .build();
         final ValidationException exception = assertThrows(ValidationException.class, new Executable() {
             @Override
@@ -112,7 +112,7 @@ public class ValidatorTest {
                 .email("asddf")
                 .login("login")
                 .name("name")
-                .birthday(LocalDate.of(1991, 11 , 1))
+                .birthday(LocalDate.of(1991, 11, 1))
                 .build();
         final ValidationException exception = assertThrows(ValidationException.class, new Executable() {
             @Override
@@ -130,7 +130,7 @@ public class ValidatorTest {
                 .email("asddf@yandex.ru")
                 .login("")
                 .name("name")
-                .birthday(LocalDate.of(1991, 11 , 1))
+                .birthday(LocalDate.of(1991, 11, 1))
                 .build();
         final ValidationException exception = assertThrows(ValidationException.class, new Executable() {
             @Override
@@ -148,7 +148,7 @@ public class ValidatorTest {
                 .email("asddf@yandex.ru")
                 .login("asd cx")
                 .name("name")
-                .birthday(LocalDate.of(1991, 11 , 1))
+                .birthday(LocalDate.of(1991, 11, 1))
                 .build();
         final ValidationException exception = assertThrows(ValidationException.class, new Executable() {
             @Override
@@ -166,7 +166,7 @@ public class ValidatorTest {
                 .email("asddf@yandex.ru")
                 .login("asdcx")
                 .name("")
-                .birthday(LocalDate.of(1991, 11 , 1))
+                .birthday(LocalDate.of(1991, 11, 1))
                 .build();
         Validator.validationCheck(user1);
         assertEquals(user1.getLogin(), user1.getName(), "Поле name не эквивалентно полю login");
@@ -179,7 +179,7 @@ public class ValidatorTest {
                 .email("asddf@yandex.ru")
                 .login("asdcx")
                 .name("name")
-                .birthday(LocalDate.of(2024, 11 , 1))
+                .birthday(LocalDate.of(2024, 11, 1))
                 .build();
         final ValidationException exception = assertThrows(ValidationException.class, new Executable() {
             @Override
