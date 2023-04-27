@@ -7,53 +7,50 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.Validator;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
+@RequestMapping("/users")
 public class UserController {
 
-    private int id = 0;
-    private List<User> users = new ArrayList<>();
+    private int idCounter = 0;
+    private Map<Integer, User> users = new HashMap<>();
 
-    @GetMapping("/users")
-    public List<User> listCategories(HttpServletRequest request) {
-        infoLog(request);
-        return users;
+    @GetMapping
+    public List<User> listCategories() {
+        log.info("Получен запрос к эндпоинту: '{} {}'",
+                "GET", "/users");
+        return List.copyOf(users.values());
     }
 
-    @PostMapping("/users")
-    public User createUser(@RequestBody User user, HttpServletRequest request) {
-        infoLog(request);
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        log.info("Получен запрос к эндпоинту: '{} {}'",
+                "POST", "/users");
         Validator.validationCheck(user);
-        for (User oldUser : users) {
-            if (user.getId() == oldUser.getId()) {
-                return null;
-            }
+        if (users.containsKey(user.getId())) {
+            return null;
         }
-        id++;
-        user.setId(id);
-        users.add(user);
+        idCounter++;
+        user.setId(idCounter);
+        users.put(idCounter, user);
         return user;
     }
 
-    @PutMapping("/users")
+    @PutMapping
     public User updateUser(@RequestBody User user, HttpServletRequest request) {
-        infoLog(request);
-        Validator.validationCheck(user);
-        for (User oldUser : users) {
-            if (user.getId() == oldUser.getId()) {
-                users.remove(oldUser);
-                users.add(user);
-                return user;
-            }
-        }
-        throw new ValidationException("Такого id не существует");
-    }
-
-    private void infoLog(HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}'",
-                request.getMethod(), request.getRequestURI());
+                "PUT", "/users");
+        Validator.validationCheck(user);
+        int userId = user.getId();
+        if (users.containsKey(userId)) {
+            users.remove(userId);
+            users.put(userId, user);
+            return user;
+        }
+        throw new ValidationException("Такого idCounter не существует");
     }
 }

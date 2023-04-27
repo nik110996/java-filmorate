@@ -6,53 +6,50 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.Validator;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
+@RequestMapping("/films")
 public class FilmController {
 
-    private int id = 0;
-    private List<Film> films = new ArrayList<>();
+    private int idCounter = 0;
+    private Map<Integer, Film> films = new HashMap<>();
 
-    @GetMapping("/films")
-    public List<Film> filmsList(HttpServletRequest request) {
-        infoLog(request);
-        return films;
+    @GetMapping
+    public List<Film> filmsList() {
+        log.info("Получен запрос к эндпоинту: '{} {}'",
+                "GET", "/films");
+        return List.copyOf(films.values());
     }
 
-    @PostMapping("/films")
-    public Film createFilm(@RequestBody Film film, HttpServletRequest request) {
-        infoLog(request);
+    @PostMapping
+    public Film createFilm(@RequestBody Film film) {
+        log.info("Получен запрос к эндпоинту: '{} {}'",
+                "POST", "/films");
         Validator.validationCheck(film);
-        for (Film oldFilm : films) {
-            if (film.getId() == oldFilm.getId()) {
-                return null;
-            }
+        if (films.containsKey(film.getId())) {
+            return null;
         }
-        id++;
-        film.setId(id);
-        films.add(film);
+        idCounter++;
+        film.setId(idCounter);
+        films.put(idCounter, film);
         return film;
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@RequestBody Film film, HttpServletRequest request) {
-        infoLog(request);
-        Validator.validationCheck(film);
-        for (Film oldFilm : films) {
-            if (oldFilm.getId() == film.getId()) {
-                films.remove(oldFilm);
-                films.add(film);
-                return film;
-            }
-        }
-        throw new ValidationException("Такого id не существует");
-    }
-
-    private void infoLog(HttpServletRequest request) {
         log.info("Получен запрос к эндпоинту: '{} {}'",
-                request.getMethod(), request.getRequestURI());
+                "PUT", "/films");
+        Validator.validationCheck(film);
+        int filmId = film.getId();
+        if (films.containsKey(filmId)) {
+            films.remove(filmId);
+            films.put(filmId, film);
+            return film;
+        }
+        throw new ValidationException("Такого idCounter не существует");
     }
 }
