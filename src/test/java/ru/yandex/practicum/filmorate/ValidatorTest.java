@@ -5,7 +5,9 @@ import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -31,10 +33,10 @@ public class ValidatorTest {
 
     @Test
     void invalidDescription() {
-    String description = "";
-    for (int i = 0; i < 200; i++) {
-        description += i;
-    }
+        String description = "";
+        for (int i = 0; i < 200; i++) {
+            description += i;
+        }
         Film film1 = Film.builder()
                 .id(1)
                 .name("Film1")
