@@ -13,11 +13,6 @@ import java.util.Set;
 public class UserService {
 
     private final UserStorage storage;
-    private User user;
-    private User secondUser;
-    private Set<Long> userFriends;
-    private Set<Long> secondUserFriends;
-
 
     public UserService(UserStorage storage) {
         this.storage = storage;
@@ -31,7 +26,11 @@ public class UserService {
     }
 
     public void addFriend(long id, long friendId) {
-        getUsersAndFriendsList(id, friendId);
+        checkUsersExisting(id, friendId);
+        User user = storage.findUserById(id);
+        User secondUser = storage.findUserById(friendId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
         if (userFriends == null) {
             userFriends = new HashSet<>();
         }
@@ -46,7 +45,11 @@ public class UserService {
     }
 
     public void deleteFriend(long id, long friendId) {
-        getUsersAndFriendsList(id, friendId);
+        checkUsersExisting(id, friendId);
+        User user = storage.findUserById(id);
+        User secondUser = storage.findUserById(friendId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
         if (userFriends != null && userFriends.contains(friendId)) {
             userFriends.remove(friendId);
             user.setFriends(userFriends);
@@ -70,8 +73,28 @@ public class UserService {
         return friendsList;
     }
 
+    public List<User> getUsers() {
+        return storage.getUsers();
+    }
+
+    public User createUser(User user) {
+        return storage.createUser(user);
+    }
+
+    public User updateUser(User user) {
+        return storage.updateUser(user);
+    }
+
+    public void deleteUsers() {
+        storage.deleteUsers();
+    }
+
     public List<User> getCommonFriends(long id, long otherId) {
-        getUsersAndFriendsList(id, otherId);
+        checkUsersExisting(id, otherId);
+        User user = storage.findUserById(id);
+        User secondUser = storage.findUserById(otherId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
         List<User> commonFriends = new ArrayList<>();
         if (secondUserFriends == null || userFriends == null) {
             return commonFriends;
@@ -85,13 +108,9 @@ public class UserService {
         return commonFriends;
     }
 
-    private void getUsersAndFriendsList(long id, long secondId) {
+    private void checkUsersExisting(long id, long secondId) {
         if (storage.findUserById(id) == null || storage.findUserById(secondId) == null) {
             throw new UserNotFoundException("Такого пользователя / пользователей - не существует ");
         }
-        user = storage.findUserById(id);
-        secondUser = storage.findUserById(secondId);
-        userFriends = user.getFriends();
-        secondUserFriends = secondUser.getFriends();
     }
 }

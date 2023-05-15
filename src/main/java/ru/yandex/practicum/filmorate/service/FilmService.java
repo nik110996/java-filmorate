@@ -6,16 +6,15 @@ import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private Film film;
-    private Set<Long> likes;
 
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
@@ -23,31 +22,43 @@ public class FilmService {
     }
 
     public Film getFilm(long id) {
-        if (filmStorage.findFilmById(id) == null) {
+        Film film = filmStorage.findFilmById(id);
+        if (film == null) {
             throw new FilmNotFoundException("Такого фильма не существует");
         }
-        return filmStorage.findFilmById(id);
+        return film;
     }
 
-    public void putLike(long id, long userId) {
-        getFilmAndLikesList(id, userId);
-        if (likes == null) {
-            likes = new HashSet<>();
-        }
-        likes.add(userId);
-        film.setLikes(likes);
+    public List<Film> getFilms() {
+        return filmStorage.getFilms();
+    }
+
+    public Film createFilm(Film film) {
+        return filmStorage.createFilm(film);
+    }
+
+    public Film updateFilm(Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    public void deleteFilms() {
+        filmStorage.deleteFilms();
+    }
+
+    public void addLike(long id, long userId) {
+        checkUserAndFilmExisting(id, userId);
+        Film film = filmStorage.findFilmById(id);
+        film.addLike(userId);
     }
 
     public void deleteLike(long id, long userId) {
-        getFilmAndLikesList(id, userId);
-        likes.remove(userId);
+        checkUserAndFilmExisting(id, userId);
+        Film film = filmStorage.findFilmById(id);
+        film.removeLike(userId);
     }
 
-    public List<Film> getTop(Long count) {
+    public List<Film> getPopular(Long count) {
         List<Film> films = sortedFilms();
-        if (count == null || count == 0) {
-            count = 10L;
-        }
         List<Film> sortedTop = new LinkedList<>();
         int k = 0;
         for (Film film : films) {
@@ -60,16 +71,13 @@ public class FilmService {
         return sortedTop;
     }
 
-
-    private void getFilmAndLikesList(long id, long userId) {
+    private void checkUserAndFilmExisting(long id, long userId) {
         if (userStorage.findUserById(userId) == null) {
             throw new UserNotFoundException("Такого пользователя не существует");
         }
         if (filmStorage.findFilmById(id) == null) {
             throw new FilmNotFoundException("Такого фильма не существует");
         }
-        film = filmStorage.findFilmById(id);
-        likes = film.getLikes();
     }
 
     private List<Film> sortedFilms() {
