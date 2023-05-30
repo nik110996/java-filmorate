@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Set;
 
 @Builder
@@ -20,4 +21,8 @@ public class User {
     private LocalDate birthday;
     @JsonIgnore
     private Set<Long> friends;
+
+    public Map<String, Object> toMap() {
+
+    }
 }
