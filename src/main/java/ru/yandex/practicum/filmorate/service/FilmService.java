@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 public class FilmService {
-
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
     @Qualifier("userDbStorage")

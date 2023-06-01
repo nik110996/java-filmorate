@@ -6,13 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
 @Primary
 @Component("userDbStorage")
 @Slf4j
@@ -36,7 +36,7 @@ public class UserDbStorage implements UserStorage {
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
-        user.setId((int) jdbcInsert.executeAndReturnKey(user.toMap()).longValue());
+        user.setId(jdbcInsert.executeAndReturnKey(user.toMap()).longValue());
         return user;
     }
 
@@ -61,11 +61,10 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
     }
 
-
-
     @Override
     public void deleteUsers() {
-
+        String sqlQuery = "delete from users";
+        jdbcTemplate.update(sqlQuery);
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
