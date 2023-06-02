@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Validator;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Component("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
@@ -45,7 +45,81 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void addFriend(long id, long friendId) {
+        checkUsersExisting(id, friendId);
+        User user = users.get(id);
+        User secondUser = users.get(friendId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
+        if (userFriends == null) {
+            userFriends = new HashSet<>();
+        }
+        if (secondUserFriends == null) {
+            secondUserFriends = new HashSet<>();
+        }
+        userFriends.add(friendId);
+        user.setFriends(userFriends);
+        secondUserFriends.add(id);
+        secondUser.setFriends(secondUserFriends);
+    }
+
+    @Override
+    public void deleteFriend(long id, long friendId) {
+        checkUsersExisting(id, friendId);
+        User user = users.get(id);
+        User secondUser = users.get(friendId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
+        if (userFriends != null && userFriends.contains(friendId)) {
+            userFriends.remove(friendId);
+            user.setFriends(userFriends);
+            secondUserFriends.remove(id);
+            secondUser.setFriends(secondUserFriends);
+            return;
+        }
+        throw new UserNotFoundException("Пользователи не являются друзьями");
+    }
+
+    @Override
+    public List<User> getFriendsList(long id) {
+        User user = users.get(id);
+        Set<Long> userFriends = user.getFriends();
+        if (userFriends == null || userFriends.isEmpty()) {
+            throw new UserNotFoundException("Список друзей пуст");
+        }
+        List<User> friendsList = new ArrayList<>();
+        for (Long friendId : userFriends) {
+            friendsList.add(users.get(friendId));
+        }
+        return friendsList;
+    }
+
+    public List<User> getCommonFriends(long id, long otherId) {
+        checkUsersExisting(id, otherId);
+        User user = users.get(id);
+        User secondUser = users.get(otherId);
+        Set<Long> userFriends = user.getFriends();
+        Set<Long> secondUserFriends = secondUser.getFriends();
+        List<User> commonFriends = new ArrayList<>();
+        if (secondUserFriends == null || userFriends == null) {
+            return commonFriends;
+        }
+        for (Long userId : userFriends) {
+            if (secondUserFriends.contains(userId)) {
+                commonFriends.add(users.get(userId));
+            }
+        }
+        return commonFriends;
+    }
+
+    @Override
     public void deleteUsers() {
         users.clear();
+    }
+
+    private void checkUsersExisting(long id, long secondId) {
+        if (!users.containsKey(id) || !users.containsKey(secondId)) {
+            throw new UserNotFoundException("Такого пользователя / пользователей - не существует ");
+        }
     }
 }

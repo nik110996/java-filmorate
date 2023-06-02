@@ -3,15 +3,15 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
+import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @Data
@@ -28,6 +28,8 @@ public class Film {
     private long duration;
     @JsonIgnore
     private Set<Long> likes;
+    private RatingMPA ratingMPA;
+    private List<FilmGenre> genres;
 
     public void addLike(long userId) {
         if (likes == null) {
