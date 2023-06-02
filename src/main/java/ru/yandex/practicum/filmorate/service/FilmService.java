@@ -18,7 +18,7 @@ public class FilmService {
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
-    @Qualifier("inMemoryUserStorage")
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
 
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {

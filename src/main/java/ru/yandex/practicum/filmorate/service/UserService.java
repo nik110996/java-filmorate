@@ -14,7 +14,7 @@ public class UserService {
     //("inMemoryUserStorage")
     //("userDbStorage")
     @Autowired
-    @Qualifier("inMemoryUserStorage")
+    @Qualifier("userDbStorage")
     private final UserStorage storage;
 
     public UserService(UserStorage storage) {
