@@ -2,16 +2,21 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.Validator;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Primary
 @Component("userDbStorage")
@@ -33,6 +38,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user)  {
+        Validator.validationCheck(user);
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -42,6 +48,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
+        long userId = user.getId();
+        try {
+            findUserById(userId);
+        } catch (EmptyResultDataAccessException e){
+            throw new UserNotFoundException("Такого idCounter не существует");
+        }
+        Validator.validationCheck(user);
         String sqlQuery = "update users set " +
                 "login = ?, name = ?, birthday = ?, email = ? " +
                 "where id = ?";
@@ -56,28 +69,40 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findUserById(long id) {
-        String sqlQuery = "select id, login, name, birthday, email " +
+        String sqlQuery = "SELECT id, login, name, birthday, email " +
                 "from users where id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+        try {
+            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
+        } catch (EmptyResultDataAccessException e){
+        throw new UserNotFoundException("Такого idCounter не существует");
+        }
     }
 
     @Override
     public void addFriend(long id, long friendId) {
-
+        String sqlInsert = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
+        jdbcTemplate.update(sqlInsert, id, friendId);
+        jdbcTemplate.update(sqlInsert, friendId, id);
     }
 
     @Override
     public void deleteFriend(long id, long friendId) {
-
+        String sqlInsert = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
+        jdbcTemplate.update(sqlInsert, id, friendId);
+        jdbcTemplate.update(sqlInsert, friendId, id);
     }
 
     @Override
     public List<User> getFriendsList(long id) {
-        return null;
+        String sqlQuery = "SELECT u.id, u.login, u.name, u.birthday, u.email FROM users u " +
+                "JOIN friends f ON f.friend_id = u.id WHERE user_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
     }
 
     @Override
     public List<User> getCommonFriends(long id, long otherId) {
+        List<User> userFriends = getFriendsList(id);
+        List<User> friendFriends = getFriendsList(otherId);
         return null;
     }
 
@@ -95,6 +120,10 @@ public class UserDbStorage implements UserStorage {
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    private Map<Long, Long> friendsToMap(long userId, long friendId) {
+        return Map.of(userId, friendId);
     }
 
     private LocalDate convertToLocalDate(Date dateToConvert) {

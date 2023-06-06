@@ -62,6 +62,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery);
     }
 
+
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
