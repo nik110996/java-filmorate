@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,5 +50,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteFilms() {
         films.clear();
+    }
+
+    @Override
+    public void addLike(long id, long userId) {
+        Film film = films.get(id);
+        film.addLike(userId);
+    }
+
+    @Override
+    public void deleteLike(long id, long userId) {
+        Film film = films.get(id);
+        film.removeLike(userId);
     }
 }

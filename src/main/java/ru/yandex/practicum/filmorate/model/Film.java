@@ -28,7 +28,8 @@ public class Film {
     private long duration;
     @JsonIgnore
     private Set<Long> likes;
-    private RatingMPA ratingMPA;
+    private RatingMPA mpa;
+    @JsonIgnore
     private List<FilmGenre> genres;
 
     public void addLike(long userId) {
@@ -51,6 +52,7 @@ public class Film {
         values.put("description", description);
         values.put("release_date", releaseDate);
         values.put("duration", duration);
+        values.put("mpa", mpa.getId());
         return values;
     }
 }

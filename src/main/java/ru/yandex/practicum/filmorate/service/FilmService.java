@@ -50,8 +50,7 @@ public class FilmService {
 
     public void addLike(long id, long userId) {
         checkUserAndFilmExisting(id, userId);
-        Film film = filmStorage.findFilmById(id);
-        film.addLike(userId);
+        filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(long id, long userId) {
