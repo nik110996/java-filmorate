@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
@@ -26,10 +25,9 @@ public class Film {
     private LocalDate releaseDate;
     @Min(1)
     private long duration;
-    @JsonIgnore
+    //@JsonIgnore
     private Set<Long> likes;
     private RatingMPA mpa;
-    @JsonIgnore
     private List<FilmGenre> genres;
 
     public void addLike(long userId) {

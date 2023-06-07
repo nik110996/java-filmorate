@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Primary
 @Component("filmDbStorage")
@@ -32,18 +34,7 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
-    private List<FilmGenre> getGenresByFilmId(long id) {
-        String sqlQuery = "SELECT genre_id FROM film_genres WHERE id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
 
-    }
-
-    private FilmGenre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return FilmGenre.builder(resultSet)
-                .id()
-                .name()
-                .build();
-    }
 
     @Override
     public Film createFilm(Film film) {
@@ -104,13 +95,36 @@ public class FilmDbStorage implements FilmStorage {
 
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        long filmId = resultSet.getLong("id");
         return Film.builder()
-                .id(resultSet.getLong("id"))
+                .id(filmId)
                 .name(resultSet.getString("name"))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getLong("duration"))
                 .mpa(findRatingById(resultSet.getLong("mpa")))
+                .genres(getGenresByFilmId(filmId))
+                .likes(getLikesByFilmId(filmId))
+                .build();
+    }
+
+    private List<FilmGenre> getGenresByFilmId(long id) {
+        String sqlQuery = "SELECT f.genre_id, g.name FROM film_genres f " +
+                "JOIN genres g ON g.id = f.genre_id WHERE film_id = ?";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
+    }
+
+    private Set<Long> getLikesByFilmId(long id) {
+        String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
+        List<Long> likes = jdbcTemplate.queryForList(sqlQuery, Long.class, id);
+        return new HashSet<Long>(likes);
+
+    }
+
+    private FilmGenre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        return FilmGenre.builder()
+                .id(resultSet.getLong("genre_id"))
+                .name("name")
                 .build();
     }
 
