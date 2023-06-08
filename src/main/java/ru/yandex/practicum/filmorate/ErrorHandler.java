@@ -30,6 +30,4 @@ public class ErrorHandler {
     public Map<String, String> handleFilmNotFound(final FilmNotFoundException e) {
         return Map.of("Ошибка /films", e.getMessage());
     }
-
-
 }

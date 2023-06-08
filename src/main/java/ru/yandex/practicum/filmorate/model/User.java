@@ -25,7 +25,7 @@ public class User {
     private Set<Long> friends;
 
     public Map<String, Object> toMap() {
-        Map<String,Object> values = new HashMap<>();
+        Map<String, Object> values = new HashMap<>();
         values.put("login", login);
         values.put("name", name);
         values.put("email", email);

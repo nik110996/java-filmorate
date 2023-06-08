@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Primary
 @Component("userDbStorage")
@@ -37,7 +34,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(User user)  {
+    public User createUser(User user) {
         Validator.validationCheck(user);
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -69,8 +66,8 @@ public class UserDbStorage implements UserStorage {
                 "from users where id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
-        } catch (EmptyResultDataAccessException e){
-        throw new UserNotFoundException("Такого idCounter не существует");
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
 
@@ -80,7 +77,6 @@ public class UserDbStorage implements UserStorage {
         checkUserExisting(friendId);
         String sqlInsert = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
         jdbcTemplate.update(sqlInsert, id, friendId);
-       // jdbcTemplate.update(sqlInsert, friendId, id);
     }
 
     @Override
@@ -107,7 +103,7 @@ public class UserDbStorage implements UserStorage {
         List<User> userFriends = getFriendsList(id);
         List<User> friendFriends = getFriendsList(otherId);
         List<User> commonFriends = new ArrayList<>();
-        for (User user: userFriends) {
+        for (User user : userFriends) {
             if (friendFriends.contains(user)) {
                 commonFriends.add(user);
             }
@@ -131,22 +127,11 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
 
-    private Map<Long, Long> friendsToMap(long userId, long friendId) {
-        return Map.of(userId, friendId);
-    }
-
-    private LocalDate convertToLocalDate(Date dateToConvert) {
-        return dateToConvert.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-    }
-
     private void checkUserExisting(long id) {
         try {
             findUserById(id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
-
 }

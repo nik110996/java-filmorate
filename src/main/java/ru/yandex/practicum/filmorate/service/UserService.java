@@ -11,8 +11,6 @@ import java.util.List;
 
 @Service
 public class UserService {
-    //("inMemoryUserStorage")
-    //("userDbStorage")
     @Autowired
     @Qualifier("userDbStorage")
     private final UserStorage storage;

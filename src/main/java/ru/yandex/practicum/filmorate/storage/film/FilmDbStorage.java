@@ -34,8 +34,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
 
-
-
     @Override
     public Film createFilm(Film film) {
         Validator.validationCheck(film);
@@ -52,18 +50,18 @@ public class FilmDbStorage implements FilmStorage {
         Validator.validationCheck(film);
         long filmId = film.getId();
         String sqlInsert = "DELETE FROM film_genres WHERE film_id = ?";
-        jdbcTemplate.update(sqlInsert,filmId);
+        jdbcTemplate.update(sqlInsert, filmId);
         findFilmById(filmId);
         String sqlQuery = "update films set " +
                 "name = ?, description = ?, release_date = ?, duration = ?, mpa = ? " +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery,
                 film.getName(),
-        film.getDescription(),
-        film.getReleaseDate(),
-        film.getDuration(),
-        film.getMpa().getId(),
-        film.getId());
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId());
         List<FilmGenre> genres = film.getGenres();
         if (genres != null) {
             film.setGenres(genres.stream().distinct().collect(Collectors.toList()));
@@ -78,7 +76,7 @@ public class FilmDbStorage implements FilmStorage {
                 "from films where id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
@@ -100,17 +98,19 @@ public class FilmDbStorage implements FilmStorage {
         String sqlInsert = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sqlInsert, id, userId);
     }
+
     @Override
     public List<FilmGenre> getAllGenre() {
         String sqlQuery = "SELECT id AS genre_id, name FROM genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
+
     @Override
     public FilmGenre getGenreById(long id) {
         String sqlQuery = "SELECT id AS genre_id, name FROM genres WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
@@ -126,7 +126,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "SELECT id, name FROM ratingMPA WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
@@ -178,7 +178,7 @@ public class FilmDbStorage implements FilmStorage {
                 "from ratingMPA where id = ?";
         try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new UserNotFoundException("Такого idCounter не существует");
         }
     }
@@ -188,8 +188,7 @@ public class FilmDbStorage implements FilmStorage {
         if (genres == null) {
             return;
         }
-        //for (FilmGenre genre: new HashSet<>(genres)) {
-        for (FilmGenre genre: genres) {
+        for (FilmGenre genre : genres) {
             String sqlInsert = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
             jdbcTemplate.update(sqlInsert, film.getId(), genre.getId());
         }

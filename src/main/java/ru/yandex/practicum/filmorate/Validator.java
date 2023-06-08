@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+
 import java.time.LocalDate;
 
 public class Validator {
@@ -36,8 +37,5 @@ public class Validator {
         if (user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("дата рождения не может быть в будущем");
         }
-        /*if (user.getId() < 0) {
-            throw new ValidationException("id не может быть отрицательным");
-        }*/
     }
 }

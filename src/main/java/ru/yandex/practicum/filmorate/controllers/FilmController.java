@@ -11,16 +11,13 @@ import java.util.List;
 
 @RestController
 @Slf4j
-//@RequestMapping("/films")
 public class FilmController {
 
     private final FilmService service;
 
-   // @Autowired
     public FilmController(FilmService service) {
         this.service = service;
     }
-
 
     @GetMapping("/films")
     public List<Film> getFilms() {
