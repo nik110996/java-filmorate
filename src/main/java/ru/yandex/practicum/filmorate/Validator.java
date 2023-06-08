@@ -13,7 +13,7 @@ public class Validator {
         if (film.getDescription().length() > 200) {
             throw new ValidationException("поле description содержит 200 или более символов");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12,28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("releaseDate дата раньше чем 28 декабря 1895 года");
         }
         if (film.getDuration() < 0) {
