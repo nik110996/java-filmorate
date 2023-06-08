@@ -26,7 +26,6 @@ public class Film {
     private long duration;
     @JsonIgnore
     private Set<Long> likes;
-   
 
     public void addLike(long userId) {
         if (likes == null) {
