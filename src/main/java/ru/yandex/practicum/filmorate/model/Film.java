@@ -29,8 +29,7 @@ public class Film {
     private long duration;
     @JsonIgnore
     private Set<Long> likes;
-    private Set<Genres> genres;
-    private Rate rate;
+   
 
     public void addLike(long userId) {
         if (likes == null) {
