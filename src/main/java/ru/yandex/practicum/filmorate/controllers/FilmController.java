@@ -3,13 +3,15 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
+import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
 
 @RestController
 @Slf4j
-@RequestMapping("/films")
+//@RequestMapping("/films")
 public class FilmController {
 
     private final FilmService service;
@@ -19,7 +21,8 @@ public class FilmController {
         this.service = service;
     }
 
-    @GetMapping
+
+    @GetMapping("/films")
     public List<Film> getFilms() {
         log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/films");
         List<Film> filmsList = service.getFilms();
@@ -27,12 +30,16 @@ public class FilmController {
         return filmsList;
     }
 
-    @GetMapping("/{id}")
+
+    @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable long id) {
-        return service.getFilm(id);
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/films/" + id);
+        Film film = service.getFilm(id);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/films/" + id, film);
+        return film;
     }
 
-    @PostMapping
+    @PostMapping("/films")
     public Film createFilm(@RequestBody Film film) {
         log.info("Получен запрос / эндпоинт: '{} {}' с телом '{}", "POST", "/films", film);
         Film savedFilm = service.createFilm(film);
@@ -40,7 +47,7 @@ public class FilmController {
         return savedFilm;
     }
 
-    @PutMapping
+    @PutMapping("/films")
     public Film updateFilm(@RequestBody Film film) {
         log.info("Получен запрос / эндпоинт: '{} {}' с телом '{}", "PUT", "/films", film);
         Film updatedFilm = service.updateFilm(film);
@@ -48,26 +55,67 @@ public class FilmController {
         return updatedFilm;
     }
 
-    @DeleteMapping
+    @DeleteMapping("/films")
     public void deleteFilms() {
         log.info("Получен запрос / эндпоинт: '{} {}'", "DELETE", "/films");
         service.deleteFilms();
         log.info("Получен ответ / эндпоинт: '{} {}'", "DELETE", "/films");
     }
 
-    @PutMapping("{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     public void putLike(@PathVariable long id, @PathVariable long userId) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "PUT", "/films/" + id);
         service.addLike(id, userId);
+        log.info("Получен ответ / эндпоинт: '{} {}'", "PUT", "/films/" + id + "/like/" + userId);
     }
 
-    @DeleteMapping("{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     public void deleteLike(@PathVariable long id, @PathVariable long userId) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "DELETE", "/films/" + id);
         service.deleteLike(id, userId);
+        log.info("Получен ответ / эндпоинт: '{} {}'", "DELETE", "/films/" + id + "/like/" + userId);
     }
 
-    @GetMapping("popular")
+    @GetMapping("/films/popular")
     public List<Film> getPopular(@RequestParam(required = false, defaultValue = "10") Long count) {
-        return service.getPopular(count);
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/films/popular " + "с параметром " + count);
+        List<Film> films = service.getPopular(count);
+        log.info("Получен ответ / эндпоинт: '{} {}'", "GET", "/films/popular " + "с параметром "
+                + count + " и с телом " + films);
+        return films;
     }
+
+    @GetMapping("/genres")
+    public List<FilmGenre> getAllGenre() {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/genres");
+        List<FilmGenre> filmsGenres = service.getAllGenre();
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/genres", filmsGenres);
+        return filmsGenres;
+    }
+
+    @GetMapping("/genres/{id}")
+    public FilmGenre getGenreById(@PathVariable long id) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/genres/" + id);
+        FilmGenre genre = service.getGenreById(id);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/genres/" + id, genre);
+        return genre;
+    }
+
+    @GetMapping("/mpa")
+    public List<RatingMPA> getRating() {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/mpa");
+        List<RatingMPA> ratingList = service.getRating();
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/mpa", ratingList);
+        return ratingList;
+    }
+
+    @GetMapping("/mpa/{id}")
+    public RatingMPA getRatingById(@PathVariable long id) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/mpa/" + id);
+        RatingMPA rating = service.getRatingById(id);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/mpa/" + id, rating);
+        return rating;
+    }
+
 
 }

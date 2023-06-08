@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
+import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.Comparator;
@@ -71,6 +73,22 @@ public class FilmService {
             }
         }
         return sortedTop;
+    }
+
+    public List<FilmGenre> getAllGenre() {
+        return filmStorage.getAllGenre();
+    }
+
+    public FilmGenre getGenreById(long id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public List<RatingMPA> getRating() {
+        return filmStorage.getRating();
+    }
+
+    public RatingMPA getRatingById(long id) {
+        return filmStorage.getRatingById(id);
     }
 
     private void checkUserAndFilmExisting(long id, long userId) {

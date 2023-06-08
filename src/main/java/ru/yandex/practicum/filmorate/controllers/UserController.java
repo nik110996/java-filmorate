@@ -54,26 +54,40 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable long id) {
-        return service.getUser(id);
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/users/" + id);
+        User user = service.getUser(id);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/users/" + id, user);
+        return user;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "PUT", "/users/" + id + "/friends/" + friendId);
         service.addFriend(id, friendId);
+        log.info("Получен ответ / эндпоинт: '{} {}'", "PUT", "/users/" + id + "/friends/" + friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info("Получен запрос / эндпоинт: '{} {}'", "DELETE", "/users/" + id + "/friends/" + friendId);
         service.deleteFriend(id, friendId);
+        log.info("Получен ответ / эндпоинт: '{} {}'", "DELETE", "/users/" + id + "/friends/" + friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriendsList(@PathVariable long id) {
-        return service.getFriendsList(id);
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/users/" + id + "/friends");
+        List<User> users = service.getFriendsList(id);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/users/" + id + "/friends", users);
+        return users;
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        return service.getCommonFriends(id, otherId);
+        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/users/" + id + "/friends/common/" + otherId);
+        List<User> users = service.getCommonFriends(id, otherId);
+        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/users/" + id
+                + "/friends/common/" + otherId, users);
+        return users;
     }
 }

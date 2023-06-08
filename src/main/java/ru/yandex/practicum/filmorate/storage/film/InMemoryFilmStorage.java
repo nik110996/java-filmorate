@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
+import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,5 +64,25 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void deleteLike(long id, long userId) {
         Film film = films.get(id);
         film.removeLike(userId);
+    }
+
+    @Override
+    public List<FilmGenre> getAllGenre() {
+        return null;
+    }
+
+    @Override
+    public FilmGenre getGenreById(long id) {
+        return null;
+    }
+
+    @Override
+    public List<RatingMPA> getRating() {
+        return null;
+    }
+
+    @Override
+    public RatingMPA getRatingById(long id) {
+        return null;
     }
 }
