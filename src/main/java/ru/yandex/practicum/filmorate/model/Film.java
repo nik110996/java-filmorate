@@ -3,9 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.filmProperty.Genres;
-import ru.yandex.practicum.filmorate.filmProperty.Rate;
-
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
