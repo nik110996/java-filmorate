@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
-import ru.yandex.practicum.filmorate.model.properties.RatingMPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -26,7 +24,6 @@ public class FilmController {
         log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/films", filmsList);
         return filmsList;
     }
-
 
     @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable long id) {
@@ -81,38 +78,4 @@ public class FilmController {
                 + count + " и с телом " + films);
         return films;
     }
-
-    @GetMapping("/genres")
-    public List<FilmGenre> getAllGenre() {
-        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/genres");
-        List<FilmGenre> filmsGenres = service.getAllGenre();
-        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/genres", filmsGenres);
-        return filmsGenres;
-    }
-
-    @GetMapping("/genres/{id}")
-    public FilmGenre getGenreById(@PathVariable long id) {
-        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/genres/" + id);
-        FilmGenre genre = service.getGenreById(id);
-        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/genres/" + id, genre);
-        return genre;
-    }
-
-    @GetMapping("/mpa")
-    public List<RatingMPA> getRating() {
-        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/mpa");
-        List<RatingMPA> ratingList = service.getRating();
-        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/mpa", ratingList);
-        return ratingList;
-    }
-
-    @GetMapping("/mpa/{id}")
-    public RatingMPA getRatingById(@PathVariable long id) {
-        log.info("Получен запрос / эндпоинт: '{} {}'", "GET", "/mpa/" + id);
-        RatingMPA rating = service.getRatingById(id);
-        log.info("Получен ответ / эндпоинт: '{} {}' с телом '{}", "GET", "/mpa/" + id, rating);
-        return rating;
-    }
-
-
 }

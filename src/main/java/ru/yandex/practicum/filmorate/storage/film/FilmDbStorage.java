@@ -5,7 +5,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.properties.FilmGenre;
@@ -36,7 +35,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        Validator.validationCheck(film);
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("films")
                 .usingGeneratedKeyColumns("id");
@@ -47,7 +45,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        Validator.validationCheck(film);
         long filmId = film.getId();
         String sqlInsert = "DELETE FROM film_genres WHERE film_id = ?";
         jdbcTemplate.update(sqlInsert, filmId);
@@ -87,50 +84,6 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sqlQuery);
     }
 
-    @Override
-    public void addLike(long id, long userId) {
-        String sqlInsert = "INSERT INTO likes (film_id, user_id) VALUES (?, ?)";
-        jdbcTemplate.update(sqlInsert, id, userId);
-    }
-
-    @Override
-    public void deleteLike(long id, long userId) {
-        String sqlInsert = "DELETE FROM likes WHERE film_id = ? AND user_id = ?";
-        jdbcTemplate.update(sqlInsert, id, userId);
-    }
-
-    @Override
-    public List<FilmGenre> getAllGenre() {
-        String sqlQuery = "SELECT id AS genre_id, name FROM genres";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
-    }
-
-    @Override
-    public FilmGenre getGenreById(long id) {
-        String sqlQuery = "SELECT id AS genre_id, name FROM genres WHERE id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new UserNotFoundException("Такого idCounter не существует");
-        }
-    }
-
-    @Override
-    public List<RatingMPA> getRating() {
-        String sqlQuery = "SELECT id, name FROM ratingMPA";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToRating);
-    }
-
-    @Override
-    public RatingMPA getRatingById(long id) {
-        String sqlQuery = "SELECT id, name FROM ratingMPA WHERE id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToRating, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new UserNotFoundException("Такого idCounter не существует");
-        }
-    }
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         long filmId = resultSet.getLong("id");
         return Film.builder()
@@ -145,13 +98,6 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    private List<FilmGenre> getGenresByFilmId(long id) {
-        String sqlQuery = "SELECT f.genre_id, g.name FROM film_genres f " +
-                "JOIN genres g ON g.id = f.genre_id WHERE f.film_id = ?";
-        List<FilmGenre> genres = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
-        return genres.stream().distinct().collect(Collectors.toList());
-    }
-
     private TreeSet<Long> getLikesByFilmId(long id) {
         String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
         List<Long> likes = jdbcTemplate.queryForList(sqlQuery, Long.class, id);
@@ -159,18 +105,11 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
-    private FilmGenre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return FilmGenre.builder()
-                .id(resultSet.getLong("genre_id"))
-                .name(resultSet.getString("name"))
-                .build();
-    }
-
-    private RatingMPA mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
-        return RatingMPA.builder()
-                .id(resultSet.getLong("id"))
-                .name(resultSet.getString("name"))
-                .build();
+    private List<FilmGenre> getGenresByFilmId(long id) {
+        String sqlQuery = "SELECT f.genre_id, g.name FROM film_genres f " +
+                "JOIN genres g ON g.id = f.genre_id WHERE f.film_id = ?";
+        List<FilmGenre> genres = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
+        return genres.stream().distinct().collect(Collectors.toList());
     }
 
     private RatingMPA findRatingById(long id) {
@@ -194,4 +133,17 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    private FilmGenre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        return FilmGenre.builder()
+                .id(resultSet.getLong("genre_id"))
+                .name(resultSet.getString("name"))
+                .build();
+    }
+
+    private RatingMPA mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
+        return RatingMPA.builder()
+                .id(resultSet.getLong("id"))
+                .name(resultSet.getString("name"))
+                .build();
+    }
 }

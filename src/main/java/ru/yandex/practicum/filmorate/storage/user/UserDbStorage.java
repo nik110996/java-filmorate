@@ -6,13 +6,11 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Primary
@@ -35,7 +33,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        Validator.validationCheck(user);
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
                 .usingGeneratedKeyColumns("id");
@@ -45,7 +42,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        Validator.validationCheck(user);
         long userId = user.getId();
         findUserById(userId);
         String sqlQuery = "update users set " +
@@ -72,52 +68,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void addFriend(long id, long friendId) {
-        checkUserExisting(id);
-        checkUserExisting(friendId);
-        String sqlInsert = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
-        jdbcTemplate.update(sqlInsert, id, friendId);
-    }
-
-    @Override
-    public void deleteFriend(long id, long friendId) {
-        checkUserExisting(id);
-        checkUserExisting(friendId);
-        String sqlInsert = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sqlInsert, id, friendId);
-        jdbcTemplate.update(sqlInsert, friendId, id);
-    }
-
-    @Override
-    public List<User> getFriendsList(long id) {
-        checkUserExisting(id);
-        String sqlQuery = "SELECT u.id, u.login, u.name, u.birthday, u.email FROM users u " +
-                "JOIN friends f ON f.friend_id = u.id WHERE user_id = ?";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
-    }
-
-    @Override
-    public List<User> getCommonFriends(long id, long otherId) {
-        checkUserExisting(id);
-        checkUserExisting(otherId);
-        List<User> userFriends = getFriendsList(id);
-        List<User> friendFriends = getFriendsList(otherId);
-        List<User> commonFriends = new ArrayList<>();
-        for (User user : userFriends) {
-            if (friendFriends.contains(user)) {
-                commonFriends.add(user);
-            }
-        }
-        return commonFriends;
-    }
-
-    @Override
     public void deleteUsers() {
         String sqlQuery = "delete from users";
         jdbcTemplate.update(sqlQuery);
     }
 
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
+    public User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("id"))
                 .login(resultSet.getString("login"))
@@ -125,13 +81,5 @@ public class UserDbStorage implements UserStorage {
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
-    }
-
-    private void checkUserExisting(long id) {
-        try {
-            findUserById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new UserNotFoundException("Такого idCounter не существует");
-        }
     }
 }

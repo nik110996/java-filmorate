@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -21,7 +20,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User createUser(User user) {
-        Validator.validationCheck(user);
         idCounter++;
         user.setId(idCounter);
         users.put(idCounter, user);
@@ -30,7 +28,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        Validator.validationCheck(user);
         long filmId = user.getId();
         if (users.containsKey(filmId)) {
             users.put(filmId, user);
@@ -44,55 +41,6 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
-    @Override
-    public void addFriend(long id, long friendId) {
-        checkUsersExisting(id, friendId);
-        User user = users.get(id);
-        User secondUser = users.get(friendId);
-        Set<Long> userFriends = user.getFriends();
-        Set<Long> secondUserFriends = secondUser.getFriends();
-        if (userFriends == null) {
-            userFriends = new HashSet<>();
-        }
-        if (secondUserFriends == null) {
-            secondUserFriends = new HashSet<>();
-        }
-        userFriends.add(friendId);
-        user.setFriends(userFriends);
-        secondUserFriends.add(id);
-        secondUser.setFriends(secondUserFriends);
-    }
-
-    @Override
-    public void deleteFriend(long id, long friendId) {
-        checkUsersExisting(id, friendId);
-        User user = users.get(id);
-        User secondUser = users.get(friendId);
-        Set<Long> userFriends = user.getFriends();
-        Set<Long> secondUserFriends = secondUser.getFriends();
-        if (userFriends != null && userFriends.contains(friendId)) {
-            userFriends.remove(friendId);
-            user.setFriends(userFriends);
-            secondUserFriends.remove(id);
-            secondUser.setFriends(secondUserFriends);
-            return;
-        }
-        throw new UserNotFoundException("Пользователи не являются друзьями");
-    }
-
-    @Override
-    public List<User> getFriendsList(long id) {
-        User user = users.get(id);
-        Set<Long> userFriends = user.getFriends();
-        if (userFriends == null || userFriends.isEmpty()) {
-            throw new UserNotFoundException("Список друзей пуст");
-        }
-        List<User> friendsList = new ArrayList<>();
-        for (Long friendId : userFriends) {
-            friendsList.add(users.get(friendId));
-        }
-        return friendsList;
-    }
 
     public List<User> getCommonFriends(long id, long otherId) {
         checkUsersExisting(id, otherId);
