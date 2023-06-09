@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Validator;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Component("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
     private long idCounter = 0;
-
 
     @Override
     public List<Film> getFilms() {
@@ -23,7 +22,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film createFilm(Film film) {
-        Validator.validationCheck(film);
         idCounter++;
         film.setId(idCounter);
         films.put(idCounter, film);
@@ -32,7 +30,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        Validator.validationCheck(film);
         long filmId = film.getId();
         if (films.containsKey(filmId)) {
             films.put(filmId, film);
